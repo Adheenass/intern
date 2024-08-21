@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path , include
 from users import router as users_api_router
+from api import urls 
 
 
 api_url_patterns = [
@@ -24,6 +25,7 @@ api_url_patterns = [
 ]
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/',include(api_url_patterns) )
+    path('api/',include(api_url_patterns) ),
+    path('prescription/', include('api.urls')),
 
 ]
