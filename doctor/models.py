@@ -52,4 +52,5 @@ class Prescription(models.Model):
     medicine = models.JSONField()
     test_date = models.DateField()
 
-    
+class EmailGeneration(models.Model):
+    email = models.EmailField()  

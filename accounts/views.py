@@ -19,7 +19,7 @@ class AccountsViewSet(ViewSet):
             serializer = RegisterSerializer(data=request.data)
             if serializer.is_valid():
                 data = serializer.validated_data
-                user = User.objects.create_user(password=data['password'], email=data['email'])
+                user = User.objects.create_user(username=data['username'] ,password=data['password'], email=data['email'])
                 token, created = Token.objects.get_or_create(user=user)
                 return Response({'data': RegisterSerializer(user).data, 'token': token.key }, status=status.HTTP_201_CREATED)
             else:
