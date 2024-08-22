@@ -1,6 +1,7 @@
 from django.db import models
 from doctor.models import DoctorUser
 
+
 # Create your models here.
 class Patient(models.Model):
     age = models.IntegerField()

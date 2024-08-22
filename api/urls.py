@@ -1,6 +1,5 @@
-from rest_framework.routers import DefaultRouter
 from django.urls import path, include
-from prescription.views import PrescriptionAPI
+from doctor.views import PrescriptionAPI
 from doctor.views import DoctorView
 from patients.views import PatientView,AppointmentView
 
