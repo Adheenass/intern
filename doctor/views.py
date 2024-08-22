@@ -6,6 +6,8 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 
 
 # Create your views here.
@@ -42,6 +44,39 @@ class DoctorView(APIView):
         data.update()
         res = {'detail': 'Student updated successfully'}
         return Response(res,status=status.HTTP_200_OK)
+
+      # Get user profile
+    def _get_profile(self, request):
+        serializer = DotorSerializer(request.user, context={'request': request})
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    # Update profile details 
+    def _update_profile(self, request):
+        data = request.data
+        if 'email' in  data :
+            return Response({'detail': 'Not allowed to change email address'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if 'username' in data:
+            return Response({'detail': 'Not allowed to change username'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try :
+            serializer = DotorSerializer(request.user, data=data, partial=True, context={'request': request})
+            if serializer.is_valid():
+                serializer.save()
+
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            
+        except Exception as e :
+            return Response({'detail': f'Something went wrong', 'exception': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    # Manage user profile 
+    @action(detail=False, methods=['get', 'patch'], permission_classes=[IsAuthenticated])
+    def profile(self, request):
+        if request.method == "get":
+            return self._get_profile(request)
+        else:
+            return self._update_profile(request)
 
 
 
