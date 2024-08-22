@@ -25,7 +25,7 @@ api_url_patterns = [
 ]
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/',include(api_url_patterns) ),
-    path('prescription/', include('api.urls')),
+    path('api/',include('api.urls') ),
+    
 
 ]
