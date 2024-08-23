@@ -34,9 +34,9 @@ class AccountsViewSet(ViewSet):
         try:
             serializer = LoginSerializer(data=request.data)
             if serializer.is_valid():
-                email = serializer.validated_data['email']
+                username = serializer.validated_data['username']
                 password = serializer.validated_data['password']
-                user = authenticate(email=email, password=password)
+                user = authenticate(username=username, password=password)
                 if user is not None:
                     token, created = Token.objects.get_or_create(user=user)
                     return Response({'token':token.key, 'username': user.username, 'email': user.email}, status=status.HTTP_200_OK)

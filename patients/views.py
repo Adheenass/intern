@@ -79,16 +79,17 @@ class PatientView(APIView):
 
 
 class AppointmentView(APIView):
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
         data = Appointment.objects.all()
         serializer = AppointmentSerializer(data, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def post(self, request):
+    def post(self, request,name=None):
 
         data = request.data
         serializer = AppointmentSerializer(data=data)
         if serializer.is_valid():
+            # serializer.save(doctor=request.user)
             serializer.save()
             res = {'detail': 'Data has been created Successfully'}
             return Response(res,status=status.HTTP_200_OK)

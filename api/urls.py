@@ -1,8 +1,9 @@
 from django.urls import path, include
 from doctor.views import PrescriptionAPI
-from doctor.views import DoctorView
+from doctor.views import DoctorView, SendEmailView
 from patients.views import PatientView,AppointmentView
 from accounts.views import AccountsViewSet
+
 
 urlpatterns = [
 
@@ -16,12 +17,15 @@ urlpatterns = [
     # ------------------DOCTOR------------------------
     path('doctor/profile/', DoctorView.as_view()),
     path('doctor/prescription/<str:name>', PrescriptionAPI.as_view()),
+    path('doctor/prescription/email/<str:email>', SendEmailView.as_view()),
+    # path('doctor/get_patient/', PatientView.as_view({'put':'_get_profile'})),
+
 
 
 
     # ------------------PATIENT------------------------
 
-    path('patient/', PatientView.as_view()),
+    path('patient/profile/', PatientView.as_view()),
     path('patient/prescription/', PrescriptionAPI.as_view()),
     path('patient/appointment/<str:name>', AppointmentView.as_view()),
 

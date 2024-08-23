@@ -3,20 +3,21 @@ from .serializers import DotorSerializer, PrescriptionSerializer
 from .models import DoctorUser, Prescription,EmailGeneration
 from rest_framework.views import APIView
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
+from patients.models import Patient
+from patients.serializers import PatientSerializer
 # emailneed
-from django.contrib import messages
 from django.core.mail import send_mail
-from django.shortcuts import render, redirect
 from django.conf import settings
+
 
 
 # Create your views here.
 class DoctorView(APIView):
+    
 
     def get(self, request):
         data = DoctorUser.objects.all()
@@ -28,11 +29,11 @@ class DoctorView(APIView):
         data = request.data
         serializer = DotorSerializer(data=data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(d_user=request.user)
             res = {'detail': 'Data has been created Successfully'}
             return Response(res,status=status.HTTP_200_OK)
 
-        return Response( serializer.errors, status=status.HTTP_200_OK)
+        return Response( serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request):
         data = request.data
@@ -86,6 +87,12 @@ class DoctorView(APIView):
 
 
 class PrescriptionAPI (APIView):
+    serializer_class = PatientSerializer
+    queryset = Patient.objects.all()
+
+    def get_object(self):
+        name = self.kwargs.get('name')
+        return Patient.objects.get(name= name)
 
     def get(self, request):
         pre = Prescription.objects.all()
@@ -126,16 +133,25 @@ class PrescriptionAPI (APIView):
 
 
 
-def subscribe(request):
-    form = EmailGeneration()
-    if request.method == 'POST':
-        form = EmailGeneration(request.POST)
-        if form.is_valid():
-            subject = 'Remainding the test Date'
-            message = 'Sending Email through Gmail'
-            recipient = form.cleaned_data.get('email')
-            send_mail(subject, 
-              message, settings.EMAIL_HOST_USER, [recipient], fail_silently=False)
-            messages.success(request, 'Success!')
-            return redirect('subscribe')
-    return render(request, 'subscriptions/home.html', {'form': form})
+
+
+class SendEmailView(APIView):
+    def post(self, request, *args, **kwargs):
+        subject = request.data.get('subject')
+        message = request.data.get('message')
+        recipient_list = request.data.get('recipient_list')  # Should be a list of email addresses
+
+        if not subject or not message or not recipient_list:
+            return Response({'error': 'Please provide subject, message, and recipient list.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            send_mail(
+                subject=subject,
+                message=message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=recipient_list,
+                fail_silently=False,
+            )
+            return Response({'success': 'Email sent successfully!'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

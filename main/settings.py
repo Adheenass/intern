@@ -129,10 +129,19 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+}
+
+
 # email_generation
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'your_account@gmail.com'
-EMAIL_HOST_PASSWORD = 'your app password'
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = '20itadheenass@ug.cusat.ac.in'
+EMAIL_HOST_PASSWORD = 'adheena123'  # Ideally, use environment variables for this
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
